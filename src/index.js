@@ -31,7 +31,8 @@ const processProject = async () => {
         }
 
         const addressesArray = Array.from(uniqueAddresses);
-        fs.writeFileSync(outputFilePath, JSON.stringify(addressesArray, null, 2));
+        const jsonOutput = { addresses: addressesArray };
+        fs.writeFileSync(outputFilePath, JSON.stringify(jsonOutput, null, 2));
         
         console.log(`Successfully processed ${projectTitle}. Unique addresses saved to ${outputFilePath}`);
     } catch (error) {
