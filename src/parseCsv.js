@@ -1,23 +1,31 @@
 const fs = require('fs');
-const csv = require('csv-parser');
+const { parse } = require('csv-parse');
 const path = require('path');
 
 /**
- * Parses a CSV file and returns a list of unique Ethereum addresses.
+ * Parses a CSV file and returns a list of addresses and their holdings.
  * @param {string} filePath - The path to the CSV file.
- * @returns {Promise<Set<string>>} - A promise that resolves to a set of unique addresses.
+ * @returns {Promise<Array>} - A promise that resolves to an array of {address, holdings} objects.
  */
 const parseCsv = (filePath) => {
     return new Promise((resolve, reject) => {
-        const addresses = new Set();
-        
+        const results = [];
         fs.createReadStream(filePath)
-            .pipe(csv())
-            .on('data', (row) => {
-                addresses.add(row.HolderAddress);
+            .pipe(parse({
+                columns: true,
+                skip_empty_lines: true
+            }))
+            .on('data', (data) => {
+                // Clean up the balance - remove commas and convert to number
+                const holdings = parseFloat(data.Balance.replace(/,/g, ''));
+                
+                results.push({
+                    address: data.HolderAddress,
+                    holdings: holdings
+                });
             })
             .on('end', () => {
-                resolve(addresses);
+                resolve(results);
             })
             .on('error', reject);
     });
