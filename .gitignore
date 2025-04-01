@@ -1,14 +1,7 @@
-# First ignore all data and output
-data/
-output/
 
-# Then explicitly allow specific directories
-!data/cultexec/
-!data/cultexec/**/*
-!data/aside/
-!data/aside/**/*
-!output/cultexec_whitelists/
-!output/cultexec_whitelists/**/*
+
+# Ignore old directory
+old/
 
 # Other ignores
 node_modules/
