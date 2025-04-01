@@ -1,13 +1,16 @@
+# First ignore all data and output
 data/
-node_modules/
 output/
-.DS_Store
 
-# Allow specific directories and their contents
+# Then explicitly allow specific directories
 !data/cultexec/
-!data/cultexec/**
+!data/cultexec/**/*
 !data/aside/
-!data/aside/**
+!data/aside/**/*
 !output/cultexec_whitelists/
-!output/cultexec_whitelists/**
+!output/cultexec_whitelists/**/*
+
+# Other ignores
+node_modules/
+.DS_Store
 
