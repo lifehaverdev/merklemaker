@@ -1,6 +1,5 @@
 const fs = require('fs');
 const { parse } = require('csv-parse');
-const path = require('path');
 
 /**
  * Parses a CSV file and returns a list of addresses and their holdings.
@@ -10,21 +9,44 @@ const path = require('path');
 const parseCsv = (filePath) => {
     return new Promise((resolve, reject) => {
         const results = [];
+        const fileName = filePath.toLowerCase();
+        const isCoinFile = fileName.includes('coin_');
+
         fs.createReadStream(filePath)
             .pipe(parse({
                 columns: true,
                 skip_empty_lines: true
             }))
             .on('data', (data) => {
-                // Clean up the balance - remove commas and convert to number
-                const holdings = parseFloat(data.Balance.replace(/,/g, ''));
-                
-                results.push({
-                    address: data.HolderAddress,
-                    holdings: holdings
-                });
+                try {
+                    if (isCoinFile) {
+                        // Handle any coin file format (CULT, MS2, etc)
+                        const holdings = parseFloat(data.Balance.replace(/,/g, ''));
+                        if (!isNaN(holdings) && holdings > 0) {
+                            results.push({
+                                address: data.HolderAddress.toLowerCase(),
+                                holdings: holdings
+                            });
+                        }
+                    } else {
+                        // Handle NFT format
+                        const address = data.HolderAddress.toLowerCase();
+                        const quantity = parseInt(data.Quantity);
+                        if (!isNaN(quantity) && quantity > 0) {
+                            results.push({
+                                address: address,
+                                holdings: quantity
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error processing row in ${fileName}:`, error);
+                }
             })
             .on('end', () => {
+                if (results.length === 0) {
+                    console.warn(`Warning: No valid entries found in ${fileName}`);
+                }
                 resolve(results);
             })
             .on('error', reject);
