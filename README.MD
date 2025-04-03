@@ -22,6 +22,10 @@ To generate the whitelists, use the following command:
 node src/index.js <PROJECT NAME>
 ```
 
+To generate the delegated cultexec whitelists, add a .env with an INFURA_ID and use the following command:
+```bash
+node src/delegate.js
+```
 
 ### Command Explanation
 
